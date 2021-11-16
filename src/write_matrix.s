@@ -25,16 +25,81 @@
 write_matrix:
 
     # Prologue
+    addi sp, sp, -24
+    sw ra, 0(sp)
+    sw s1, 4(sp)
+    sw s2, 8(sp)
+    sw s3, 12(sp)
+    sw s4, 16(sp)
+    sw s5, 20(sp)
 
+    mv s1, a0
+    mv s2, a1
+    mv s3, a2
+    mv s4, a3
 
+    # fopen
+    mv a1, s1
+    li a2, 1
+    jal fopen
+    blt a0, x0, exit89
+    mv s5, a0
 
+    # fwrite rows and rols
+    mv a1, s5
+    addi sp, sp, -8
+    sw s3, 0(sp)
+    sw s4, 4(sp)
+    mv a2, sp
+    li a3, 2
+    li a4, 4
+    addi sp, sp, -4
+    sw a3, 0(sp)
+    jal fwrite
+    lw a3, 0(sp)
+    addi sp, sp, 4
+    bne a0, a3, exit92
+    lw s3, 0(sp)
+    lw s4, 4(sp)
+    addi, sp, sp, 8
 
+    # fwrite data
+    mv a1, s5
+    mv a2, s2
+    mul t0, s3, s4
+    mv a3, t0
+    li a4, 4
+    addi sp, sp, -4
+    sw a3, 0(sp)
+    jal fwrite
+    lw a3, 0(sp)
+    addi sp, sp, 4
+    bne a0, a3, exit92
 
-
-
-
+    # fclose
+    mv a1, s5
+    jal fclose
+    blt a0, x0, exit90
 
     # Epilogue
-
+    lw ra, 0(sp)
+    lw s1, 4(sp)
+    lw s2, 8(sp)
+    lw s3, 12(sp)
+    lw s4, 16(sp)
+    lw s5, 20(sp)
+    addi, sp, sp, 24
 
     ret
+
+
+
+exit89:
+    li a1, 89
+    call exit2
+exit90:
+    li a1, 90
+    call exit2
+exit92:
+    li a1, 92
+    call exit2
